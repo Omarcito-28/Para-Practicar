@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Asignaturas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
+    <a class="navbar-brand" href="/asignatures">Asignaturas</a>
+    <form th:action="@{/logout}" method="post" class="ms-auto">
+        <button class="btn btn-outline-danger">Cerrar sesión</button>
+    </form>
+</nav>
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Lista de Asignaturas</h1>
+        <div sec:authorize="hasAuthority('ADMIN')">
+            <a class="btn btn-success" href="/asignatures/new">Agregar Nueva Asignatura</a>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+        <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Salón</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Docente</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="asignatura : ${asignaturas}">
+            <td th:text="${asignatura.name}"></td>
+            <td th:text="${asignatura.description}"></td>
+            <td th:text="${asignatura.classroom}"></td>
+            <td th:text="${asignatura.startTime}"></td>
+            <td th:text="${asignatura.endTime}"></td>
+            <td th:text="${asignatura.professor.name}"></td>
+            <td>
+                <div sec:authorize="hasAuthority('ADMIN')">
+                    <a class="btn btn-sm btn-warning" th:href="@{/asignatures/edit/{id}(id=${asignatura.id})}">Editar</a>
+                    <a class="btn btn-sm btn-danger" th:href="@{/asignatures/delete/{id}(id=${asignatura.id})}"
+                       onclick="return confirm('¿Estás seguro de eliminar esta asignatura?')">Eliminar</a>
+                </div>
+                <div sec:authorize="hasAuthority('DOCENTE')">
+                    <sec:authorize access="${asignatura.professor.id == userDetails.id}">
+                        <a class="btn btn-sm btn-warning" th:href="@{/asignatures/edit/{id}(id=${asignatura.id})}">Editar</a>
+                    </sec:authorize>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
